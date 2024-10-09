@@ -1,5 +1,6 @@
 from .models import Profile, Question, Answer
 from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
 from datetime import datetime
 
 
@@ -7,6 +8,8 @@ def create_profile(username, password, gender, birthdate, bio=''):
 	user = User.objects.create_user(
 		username=username,
 		password=password)
+
+	Token.objects.create(user=user)
 
 	return Profile.objects.create(
 		user=user,
