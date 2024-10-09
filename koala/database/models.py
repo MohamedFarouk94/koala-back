@@ -17,18 +17,19 @@ class Profile(models.Model):
 	birthdate = models.DateField()
 
 	def _get_all_unsnwered_questions(self):
-		return [q for q in Question.objects.filter(to_x=self) if not q.is_answered()]
+		return self.questions_to.filter(answer__isnull=True).order_by('-id')
 
 	def _get_all_answers(self):
-		return Answer.objects.filter(question__to_x=self)
+		answered_questions = self.questions_to.filter(answer__isnull=False)
+		return Answer.objects.filter(question__in=answered_questions).order_by('-id')
 
 	def get_unanswered_questions(self, page):
 		page = max(page, 1)
-		return Question.objects.filter(to_=self, is_answered=False)[::-1][20 * (page - 1): 20 * page + 1]
+		return self._get_all_unsnwered_questions()[(page - 1) * 20: page * 20]
 
 	def get_answers(self, page):
 		page = max(page, 1)
-		return Answer.objects.filter(question__to_=self)[::-1][20 * (page - 1): 20 * page + 1]
+		return self._get_all_answers()[(page - 1) * 20: page * 20]
 
 	def get_n_unanswered_questions(self):
 		return len(self._get_all_unsnwered_questions())
@@ -72,6 +73,18 @@ class Question(models.Model):
 		try:
 			return self.answer
 		except Answer.DoesNotExist:
+			return None
+
+	def get_answer_text(self):
+		try:
+			return self.answer.text
+		except Answer.DoesNotExist:
+			return ''
+
+	def get_date_answered(self):
+		try:
+			return self.answer.date_answered
+		except Answer.DoesNotExist:
 			return ''
 
 	def to_dict(self):
@@ -82,8 +95,8 @@ class Question(models.Model):
 			'date_asked': self.date_asked,
 			'is_answered': self.is_answered(),
 			'is_private': self.is_private,
-			'answer': self.get_answer().text if self.is_answered() else '',
-			'date_answered': self.get_answer().date_answered if self.is_answered() else '',
+			'answer': self.get_answer_text(),
+			'date_answered': self.get_date_answered()
 		}
 
 
@@ -96,7 +109,7 @@ class Answer(models.Model):
 	def to_dict(self):
 		return {
 			'asker': self.question.from_x.user.username if not self.question.is_anon else '?',
-			'answerer': self.question.to_.user.username,
+			'answerer': self.question.to_x.user.username,
 			'is_private': self.question.is_private,
 			'question': self.question.text,
 			'answer': self.text,
