@@ -89,6 +89,7 @@ class Question(models.Model):
 
 	def to_dict(self):
 		return {
+			'id': self.id,
 			'from': self.from_x.user.username if not self.is_anon else '?',
 			'to': self.to_x.user.username,
 			'text': self.text,
@@ -108,6 +109,7 @@ class Answer(models.Model):
 
 	def to_dict(self):
 		return {
+			'id': self.id,
 			'asker': self.question.from_x.user.username if not self.question.is_anon else '?',
 			'answerer': self.question.to_x.user.username,
 			'is_private': self.question.is_private,
