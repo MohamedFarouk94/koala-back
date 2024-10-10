@@ -6,6 +6,7 @@ urlpatterns = [
 	path('', views.hello_world, name='hello_world'),
 	path('login', views.login, name='login'),
 	path('handshake', views.handshake, name='handshake'),
+	path('profile/<str:username>/answers/<int:page>', views.get_answers, name='answers'),
 	path('profile/<str:username>', views.get_profile, name='profile'),
 	path('my-questions/<int:page>', views.get_my_questions, name='my_questions'),
 	path('profile/<str:username>/ask-unauth', views.ask_unauth, name='ask_unauth'),

@@ -24,6 +24,16 @@ def get_profile(request, **kwargs):
 
 
 @api_view(['GET'])
+def get_answers(request, **kwargs):
+	try:
+		profile = Profile.objects.get(user__username=kwargs['username'])
+		answers = profile.get_answers(kwargs['page'])
+		return Response([answer.to_dict() for answer in answers])
+	except ObjectDoesNotExist:
+		return HttpResponseNotFound('{"details": "User not found."}')
+
+
+@api_view(['GET'])
 def login(request, **kwargs):
 	try:
 		username, password = request.data['username'], request.data['password']
