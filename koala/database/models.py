@@ -40,16 +40,16 @@ class Profile(models.Model):
 	def to_dict(self):
 		return {
 			'username': self.user.username,
-			'first_name': self.user.first_name,
-			'last_name': self.user.last_name,
+			'firstName': self.user.first_name,
+			'lastName': self.user.last_name,
 			'email': self.user.email,
-			'date_joined': self.user.date_joined,
-			'last_login': self.user.last_login,
+			'dateJoined': self.user.date_joined,
+			'lastLogin': self.user.last_login,
 			'bio': self.bio,
 			'gender': self.gender,
 			'birthdate': self.birthdate,
-			'n_answers': self.get_n_answers(),
-			'n_unanswered_questions': self.get_n_unanswered_questions(),
+			'nAnswers': self.get_n_answers(),
+			'nUnansweredQuestions': self.get_n_unanswered_questions(),
 		}
 
 
@@ -93,11 +93,11 @@ class Question(models.Model):
 			'from': self.from_x.user.username if not self.is_anon else '?',
 			'to': self.to_x.user.username,
 			'text': self.text,
-			'date_asked': self.date_asked,
-			'is_answered': self.is_answered(),
-			'is_private': self.is_private,
+			'dateAsked': self.date_asked,
+			'isAnswered': self.is_answered(),
+			'isPrivate': self.is_private,
 			'answer': self.get_answer_text(),
-			'date_answered': self.get_date_answered()
+			'dateAnswered': self.get_date_answered()
 		}
 
 
@@ -112,9 +112,9 @@ class Answer(models.Model):
 			'id': self.id,
 			'asker': self.question.from_x.user.username if not self.question.is_anon else '?',
 			'answerer': self.question.to_x.user.username,
-			'is_private': self.question.is_private,
+			'isPrivate': self.question.is_private,
 			'question': self.question.text,
 			'answer': self.text,
-			'date_asked': self.question.date_asked,
-			'date_answered': self.date_answered
+			'dateAsked': self.question.date_asked,
+			'dateAnswered': self.date_answered
 		}
