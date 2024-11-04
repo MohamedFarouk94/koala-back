@@ -122,8 +122,8 @@ class Answer(models.Model):
 
 class Follow(models.Model):
 	id = models.BigAutoField(primary_key=True)
-	following = models.ForeignKey(Profile, on_delete=models.SET_NULL, related_name='followers_set')
-	follower = models.ForeignKey(Profile, on_delete=models.SET_NULL, related_name='following_set')
+	following = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='followers_set')
+	follower = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='following_set')
 	date_created = models.DateTimeField(auto_now_add=True)
 	date_terminated = models.DateTimeField(null=True)
 
