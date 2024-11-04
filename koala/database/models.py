@@ -24,7 +24,7 @@ class Profile(models.Model):
 		return Answer.objects.filter(question__in=answered_questions).order_by('-id')
 
 	def _get_all_followers(self):
-		return self.follower_set.filter(date_terminated__isnull=True).order_by('-id')
+		return self.followers_set.filter(date_terminated__isnull=True).order_by('-id')
 
 	def _get_all_following(self):
 		return self.following_set.filter(date_terminated__isnull=True).order_by('-id')
