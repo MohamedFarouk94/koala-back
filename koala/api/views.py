@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
-from database.models import Profile, Question
-from database.creators import create_question, create_answer
+from database.models import Profile, Question, Follow
+from database.creators import create_question, create_answer, create_follow
 from rest_framework.authtoken.models import Token
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
@@ -113,3 +113,21 @@ def answer(request, **kwargs):
 		return HttpResponseNotFound('{"details": "Question not found."}')
 	except AssertionError:
 		return HttpResponse('{"details": "You are not authorized to answer this question."}', status=403)
+
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def follow(request, **kwargs):
+	try:
+		following = Profile.objects.get(user__username=kwargs['username'])
+		follower = Profile.objects.get(user=request.user)
+		assert not Follow.objects.filter(follower=follower, following=following, date_terminated__isnull=True).exists()
+		follow_instance = create_follow(follower, following)
+		return Response(follow_instance.to_dict())
+	except KeyError:
+		return HttpResponseBadRequest('{"details": "Not valid request."}')
+	except ObjectDoesNotExist:
+		return HttpResponseNotFound('{"details": "User not found."}')
+	except AssertionError:
+		return HttpResponse('{"details": "Following instance already exists."}', status=409)

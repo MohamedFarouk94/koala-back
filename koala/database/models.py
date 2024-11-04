@@ -23,6 +23,12 @@ class Profile(models.Model):
 		answered_questions = self.questions_to.filter(answer__isnull=False)
 		return Answer.objects.filter(question__in=answered_questions).order_by('-id')
 
+	def _get_all_followers(self):
+		return self.follower_set.filter(date_terminated__isnull=True).order_by('-id')
+
+	def _get_all_following(self):
+		return self.following_set.filter(date_terminated__isnull=True).order_by('-id')
+
 	def get_unanswered_questions(self, page):
 		page = max(page, 1)
 		return self._get_all_unsnwered_questions()[(page - 1) * 20: page * 20]
@@ -31,11 +37,25 @@ class Profile(models.Model):
 		page = max(page, 1)
 		return self._get_all_answers()[(page - 1) * 20: page * 20]
 
+	def get_followers(self, page):
+		page = max(page, 1)
+		return self._get_all_followers()[(page - 1) * 20: page * 20]
+
+	def get_following(self, page):
+		page = max(page, 1)
+		return self._get_all_following()[(page - 1) * 20: page * 20]
+
 	def get_n_unanswered_questions(self):
 		return len(self._get_all_unsnwered_questions())
 
 	def get_n_answers(self):
 		return len(self._get_all_answers())
+
+	def get_n_followers(self):
+		return len(self._get_all_followers())
+
+	def get_n_following(self):
+		return len(self._get_all_following())
 
 	def to_dict(self):
 		return {
@@ -50,6 +70,8 @@ class Profile(models.Model):
 			'birthdate': self.birthdate,
 			'nAnswers': self.get_n_answers(),
 			'nUnansweredQuestions': self.get_n_unanswered_questions(),
+			'nFollowers': self.get_n_followers(),
+			'nFollowing': self.get_n_following()
 		}
 
 
@@ -132,5 +154,6 @@ class Follow(models.Model):
 			'id': self.id,
 			'following': self.following.user.username,
 			'follower': self.follower.user.username,
-			'date_created': self.date_created
+			'dateCreated': self.date_created,
+			'dateTerminated': self.date_terminated
 		}

@@ -1,4 +1,4 @@
-from .models import Profile, Question, Answer
+from .models import Profile, Question, Answer, Follow
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from datetime import datetime
@@ -35,3 +35,9 @@ def create_answer(question, text):
 	return Answer.objects.create(
 		question=question,
 		text=text)
+
+
+def create_follow(follower, following):
+	return Follow.objects.create(
+		follower=follower,
+		following=following)
