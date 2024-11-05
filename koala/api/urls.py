@@ -13,4 +13,5 @@ urlpatterns = [
 	path('profile/<str:username>/ask-auth', views.ask_auth, name='ask_auth'),
 	path('question/<int:qid>/answer', views.answer, name='answer'),
 	path('profile/<str:username>/follow', views.follow, name='follow'),
+	path('profile/<str:username>/unfollow', views.unfollow, name='unfollow'),
 ]

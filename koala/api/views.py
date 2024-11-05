@@ -2,6 +2,7 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework.response import Response
 from database.models import Profile, Question, Follow
 from database.creators import create_question, create_answer, create_follow
+from database.destroyers import termiante_follow
 from rest_framework.authtoken.models import Token
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
@@ -132,3 +133,22 @@ def follow(request, **kwargs):
 		return HttpResponseNotFound('{"details": "User not found."}')
 	except AssertionError:
 		return HttpResponse('{"details": "Following instance already exists or you cannot follow this user."}', status=409)
+
+
+@api_view(['DELETE'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def unfollow(request, **kwargs):
+	try:
+		following = Profile.objects.get(user__username=kwargs['username'])
+		follower = Profile.objects.get(user=request.user)
+		assert not Follow.objects.filter(follower=follower, following=following, date_terminated__isnull=True).exists()
+		follow_instance = Follow.objects.filter(follower=follower, following=following, date_terminated__isnull=True).first()
+		follow_instance = termiante_follow(follow_instance)
+		return Response(follow_instance.to_dict())
+	except KeyError:
+		return HttpResponseBadRequest('{"details": "Not valid request."}')
+	except ObjectDoesNotExist:
+		return HttpResponseNotFound('{"details": "User not found."}')
+	except AssertionError:
+		return HttpResponse('{"details": "Following instance does not exist or you cannot unfollow this user."}', status=409)
