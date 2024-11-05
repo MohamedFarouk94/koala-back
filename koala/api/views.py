@@ -35,6 +35,26 @@ def get_answers(request, **kwargs):
 
 
 @api_view(['GET'])
+def get_followers(request, **kwargs):
+	try:
+		profile = Profile.objects.get(user__username=kwargs['username'])
+		followers = profile.get_followers(kwargs['page'])
+		return Response([follow_instance.follower.to_dict() for follow_instance in followers])
+	except ObjectDoesNotExist:
+		return HttpResponseNotFound('{"details": "User not found."}')
+
+
+@api_view(['GET'])
+def get_following(request, **kwargs):
+	try:
+		profile = Profile.objects.get(user__username=kwargs['username'])
+		following = profile.get_following(kwargs['page'])
+		return Response([follow_instance.following.to_dict() for follow_instance in following])
+	except ObjectDoesNotExist:
+		return HttpResponseNotFound('{"details": "User not found."}')
+
+
+@api_view(['GET'])
 def login(request, **kwargs):
 	try:
 		username, password = request.data['username'], request.data['password']
