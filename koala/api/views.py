@@ -162,7 +162,7 @@ def unfollow(request, **kwargs):
 	try:
 		following = Profile.objects.get(user__username=kwargs['username'])
 		follower = Profile.objects.get(user=request.user)
-		assert not Follow.objects.filter(follower=follower, following=following, date_terminated__isnull=True).exists()
+		assert Follow.objects.filter(follower=follower, following=following, date_terminated__isnull=True).exists()
 		follow_instance = Follow.objects.filter(follower=follower, following=following, date_terminated__isnull=True).first()
 		follow_instance = termiante_follow(follow_instance)
 		return Response(follow_instance.to_dict())
