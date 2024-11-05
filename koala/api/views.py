@@ -123,6 +123,7 @@ def follow(request, **kwargs):
 		following = Profile.objects.get(user__username=kwargs['username'])
 		follower = Profile.objects.get(user=request.user)
 		assert not Follow.objects.filter(follower=follower, following=following, date_terminated__isnull=True).exists()
+		assert follower != following
 		follow_instance = create_follow(follower, following)
 		return Response(follow_instance.to_dict())
 	except KeyError:
@@ -130,4 +131,4 @@ def follow(request, **kwargs):
 	except ObjectDoesNotExist:
 		return HttpResponseNotFound('{"details": "User not found."}')
 	except AssertionError:
-		return HttpResponse('{"details": "Following instance already exists."}', status=409)
+		return HttpResponse('{"details": "Following instance already exists or you cannot follow this user."}', status=409)
